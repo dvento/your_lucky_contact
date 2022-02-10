@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- to handle non-https websites-->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">myCoolURL.com</domain>
+    </domain-config>
+</network-security-config>

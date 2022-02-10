@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Your fortune contact</string>
+    <string name="btnText">Unveil your fortune contact</string>
+    <string name="welcomeCont">Welcome!</string>
+    <string name="contTextPerm">Hi! In order to calculate who is your fortune contact, first we need permission to read your contacts; otherwise the app won\'t work :( . A dialog will show up</string>
+    <string name="ok">Great!</string>
+    <string name="notifTextPerm">Hi once again! This is the last time we bother you! We also need permission to notify you about your luckiness changes. A dialog will show up, just enable this app</string>
+    <string name="coolText">You\'re about to know who among your contacts and loved ones will play a key role in your luck ...</string>
+    <string name="luckyNumIs">Your fortune contact is:</string>
+    <string name="errorCalc">Your fortune contact could not be determined!</string>
+    <string name="already">"You already found your lucky contact: "</string>
+</resources>
