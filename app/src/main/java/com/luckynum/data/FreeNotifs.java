@@ -3,15 +3,10 @@ package com.luckynum.data;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
-import com.luckynum.R;
-import com.luckynum.model.Contact;
 import com.luckynum.model.Notif;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -33,12 +28,13 @@ public class FreeNotifs {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
-
         executor.execute(() -> {
+            // convert list of notifiations to JSON
             convertToJSON(notifications);
             handler.post(() -> {
 
                 Thread dataThread = new Thread(() -> {
+                    // after notifications have been converted to JSON
                     try {
                         // try to send the data to the URL
                         sendData();
@@ -49,7 +45,6 @@ public class FreeNotifs {
                     }
                 });
                 dataThread.start();
-                Log.i("hey", "converted!\n" + contactsJSON);
             });
         });
 

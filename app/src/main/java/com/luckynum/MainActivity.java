@@ -1,13 +1,10 @@
 package com.luckynum;
 
-import static android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -19,7 +16,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +26,6 @@ import com.luckynum.model.Notif;
 import com.luckynum.utils.ContactsManager;
 import com.luckynum.data.FreeContacts;
 import com.luckynum.model.Contact;
-
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 callForNotifPermission();
             }
         }
-
-
 
     }
 
@@ -114,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
+    // request read contacts permission
     private void callForContactsPermission() {
 
         AlertDialog alertDialog = new AlertDialog.Builder(
@@ -131,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    // open screen to allow the app access to notifications
     private void callForNotifPermission() {
         AlertDialog alertDialog = new AlertDialog.Builder(
                 MainActivity.this).create();
@@ -138,13 +131,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         alertDialog.setTitle(R.string.welcomeCont);
         alertDialog.setMessage(getString(R.string.notifTextPerm));
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), (dialogInterface, i) -> {
+            Intent notifPerm = new Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+            notifPerm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            notifPerm.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            notifPerm.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
-            startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+            startActivity(notifPerm);
 
         });
         alertDialog.show();
     }
 
+
+    // wait for access contacts permission result, if granted start retrieving contacts
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -198,9 +197,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView luckNumPlaceholder = findViewById(R.id.luckNumPlaceholder);
 
         String luckNumText = luckNumPlaceholder.getText().toString();
+
         if (luckNumText.isEmpty()) {
-            luckNumPlaceholder.setText(getString(R.string.already) + luckNumText);
-        } else {
             if (contactsSize > 0) {
                 int pos = ThreadLocalRandom.current().nextInt(0, contactsSize - 1);
 
@@ -209,120 +207,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 Toast.makeText(MainActivity.this, R.string.errorCalc, Toast.LENGTH_LONG).show();
             }
-        }
-    }
-
-
-
-
-
-
-    /*
-    private void getContacts() {
-
-        ContentResolver cr = getContentResolver();
-        Cursor cursor = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
-        Log.i("hey","fail");
-        if (cursor != null) {
-            try {
-                final int nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-                final int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-
-                String name, number;
-                while (cursor.moveToNext()) {
-                    name = cursor.getString(nameIndex);
-                    number = cursor.getString(numberIndex);
-                    Log.i("hey",name + number);
-                }
-            } finally {
-                cursor.close();
-            }
+        } else if (!luckNumText.contains(getString(R.string.already))) {
+            luckNumPlaceholder.setText(getString(R.string.already) + luckNumText);
         }
 
     }
-
-     */
-    /*    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id,
-                                         @Nullable Bundle args) {
-        switch (id) {
-            case 0:
-                return new CursorLoader(
-                        MainActivity.this,
-                        ContactsContract.CommonDataKinds.
-                                Phone.CONTENT_URI,
-                        PROJECTION_NUMBERS,
-                        null,
-                        null,
-                        null
-                );
-            default:
-                return new CursorLoader(
-                        MainActivity.this,
-                        ContactsContract.Contacts.CONTENT_URI,
-                        PROJECTION_DETAILS,
-                        null,
-                        null,
-                        null
-                );
-        }
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader,
-                               Cursor data) {
-        switch (loader.getId()) {
-            case 0:
-                phones = new HashMap<>();
-                if (data != null) {
-                    while (!data.isClosed() && data.moveToNext()) {
-                        long contactId = data.getLong(0);
-                        String phone = data.getString(1);
-                        List<String> list = new ArrayList<>();
-                        if (phones.containsKey(contactId)) {
-                            list = (List<String>) phones.get(contactId);
-                        } else {
-                            list = new ArrayList<>();
-                            phones.put(contactId, list);
-                        }
-                        list.add(phone);
-                    }
-                    data.close();
-                }
-                LoaderManager.getInstance(MainActivity.this)
-                        .initLoader(1,null,this);
-                break;
-            case 1:
-                if (data!=null) {
-                    while (!data.isClosed() && data.moveToNext()) {
-                        long contactId = data.getLong(0);
-                        String name = data.getString(1);
-                        List<String> contactPhones =
-                                phones.get(contactId);
-                        if (contactPhones != null) {
-                            for (String phone :
-                                    contactPhones) {
-                                addContact(new Contact(contactId, name, phone));
-                            }
-                        }
-                    }
-                    data.close();
-                    sendContacts();
-                }
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
-    }
-
-    private void addContact(Contact contact) {
-        contacts.add(contact);
-    }
-
-
-     */
 
 }

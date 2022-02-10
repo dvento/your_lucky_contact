@@ -1,22 +1,16 @@
 package com.luckynum.data;
 
-import android.app.Activity;
-import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
-import com.luckynum.R;
 import com.luckynum.model.Contact;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,10 +35,13 @@ public class FreeContacts {
 
 
         executor.execute(() -> {
+            // convert list of contacts to JSON
+
             convertToJSON();
             handler.post(() -> {
 
                 Thread dataThread = new Thread(() -> {
+                    // after contacts have been converted to JSON
                     try {
                         // try to send the data to the URL
                         sendData();

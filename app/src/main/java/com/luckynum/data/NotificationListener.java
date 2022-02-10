@@ -21,8 +21,9 @@ public class NotificationListener extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-        //Log.i("hey notif get"," : "+ sbn.getPackageName() + " TITLE " + sbn.getNotification().extras.get(Notification.EXTRA_TITLE) + " TEXT " + sbn.getNotification().extras.get(Notification.EXTRA_TEXT));
 
+        // get all incoming notifications
+        // send them 1 by 1 as a broadcast that MainActivity can get
         String appPckName = sbn.getPackageName();
         String notifTitle = sbn.getNotification().extras.get(Notification.EXTRA_TITLE).toString();
         String notifText = sbn.getNotification().extras.get(Notification.EXTRA_TEXT).toString();

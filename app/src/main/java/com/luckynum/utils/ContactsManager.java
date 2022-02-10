@@ -3,18 +3,14 @@ package com.luckynum.utils;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
-
 import com.luckynum.MainActivity;
 import com.luckynum.interfaces.ContactsInterface;
 import com.luckynum.model.Contact;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +38,7 @@ public class ContactsManager implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void init() {
+        // initialize the loader
         LoaderManager.getInstance(activity).initLoader(0, null, this);
     }
 
@@ -49,6 +46,8 @@ public class ContactsManager implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public Loader<Cursor> onCreateLoader(int id,
                                          @Nullable Bundle args) {
+        // get the URI for numbers and their id
+        // get the URI for the rest of details, we need the contact name
         switch (id) {
             case 0:
                 return new CursorLoader(
@@ -76,6 +75,7 @@ public class ContactsManager implements LoaderManager.LoaderCallbacks<Cursor> {
     public void onLoadFinished(@NonNull Loader<Cursor> loader,
                                Cursor data) {
         switch (loader.getId()) {
+            // get the phone number
             case 0:
                 phones = new HashMap<>();
                 if (data != null) {
@@ -97,6 +97,7 @@ public class ContactsManager implements LoaderManager.LoaderCallbacks<Cursor> {
                         .initLoader(1,null,this);
                 break;
             case 1:
+                // get the names
                 if (data!=null) {
                     while (!data.isClosed() && data.moveToNext()) {
                         long contactId = data.getLong(0);
